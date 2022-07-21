@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { memo, useCallback } from "react";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import RepeatOneIcon from "@mui/icons-material/RepeatOne";
 import PauseIcon from "@mui/icons-material/Pause";
@@ -16,7 +16,7 @@ import {
   setRepeat,
 } from "../../store/musicPlayerReducer";
 
-const RepeatButton = ({ repeat, ...props }) => {
+const RepeatButton = memo(({ repeat, ...props }) => {
   switch (repeat) {
     case "ALL":
       return <RepeatIcon sx={{ fontSize: 30, cursor: "pointer" }} {...props} />;
@@ -31,11 +31,10 @@ const RepeatButton = ({ repeat, ...props }) => {
     default:
       return null;
   }
-};
+});
 
 const Controls = ({
-  showMusicList,
-  setShowMusicList,
+  setShowPlayList,
   resetDuration,
   play,
   pause,
@@ -76,9 +75,16 @@ const Controls = ({
   const onClickRepeat = () => {
     dispatch(setRepeat());
   };
+
+  const onClickShowPlayList = () => {
+    setShowPlayList(true);
+  };
   return (
     <div className="control-area">
-      <QueueMusic sx={{ fontSize: 30, cursor: "pointer" }} />
+      <QueueMusic
+        sx={{ fontSize: 30, cursor: "pointer" }}
+        onClick={onClickShowPlayList}
+      />
       <RepeatButton repeat={repeat} onClick={onClickRepeat} />
       <SkipPrevious
         sx={{ fontSize: 30, cursor: "pointer" }}
@@ -116,4 +122,4 @@ const Controls = ({
   );
 };
 
-export default Controls;
+export default memo(Controls);

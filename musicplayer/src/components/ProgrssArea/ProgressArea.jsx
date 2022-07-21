@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   useState,
   useCallback,
+  memo,
 } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import "./ProgressArea.scss";
@@ -43,37 +44,39 @@ function ProgressArea(props, ref) {
     },
   }));
 
-  const onPlay = () => {
+  const onPlay = useCallback(() => {
     dispatch(playMusic());
-  };
+  }, [dispatch]);
 
-  const getTime = (time) => {
+  const getTime = useCallback((time) => {
     const minute = `0${parseInt(time / 60, 10)}`;
     const seconds = `0${parseInt(time % 60)}`;
-
     return `${minute}:${seconds.slice(-2)}`;
-  };
+  }, []);
 
-  const onClickProgress = (event) => {
+  const onClickProgress = useCallback((event) => {
     const progressBarWidth = event.currentTarget.clientWidth;
     const offsetX = event.nativeEvent.offsetX;
     const duration = audio.current.duration;
     audio.current.currentTime = (offsetX / progressBarWidth) * duration;
-  };
+  }, []);
 
-  const onTimeUpdate = (event) => {
-    if (event.target.readyState === 0) return;
-    const currentTime = event.target.currentTime;
-    const duration = event.target.duration;
-    const progressBarWidth = (currentTime / duration) * 100;
-    progressBar.current.style.width = `${progressBarWidth}%`;
-    setCurrentTime(getTime(currentTime));
-    setDuration(getTime(duration));
-  };
+  const onTimeUpdate = useCallback(
+    (event) => {
+      if (event.target.readyState === 0) return;
+      const currentTime = event.target.currentTime;
+      const duration = event.target.duration;
+      const progressBarWidth = (currentTime / duration) * 100;
+      progressBar.current.style.width = `${progressBarWidth}%`;
+      setCurrentTime(getTime(currentTime));
+      setDuration(getTime(duration));
+    },
+    [getTime]
+  );
 
-  const onPause = () => {
+  const onPause = useCallback(() => {
     dispatch(stopMusic());
-  };
+  }, [dispatch]);
 
   const onEnded = useCallback(() => {
     if (repeat === "ONE") {
@@ -104,4 +107,4 @@ function ProgressArea(props, ref) {
   );
 }
 
-export default forwardRef(ProgressArea);
+export default memo(forwardRef(ProgressArea));
